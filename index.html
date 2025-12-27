@@ -65,7 +65,17 @@
                         <div class="debug-word">
                             Current Word: <span id="debug-word">---</span>
                         </div>
-                        <button id="reset-game-btn" class="debug-button">Reset Game</button>
+                        <div id="reset-normal" class="reset-normal">
+                            <button id="reset-game-btn" class="debug-button">Reset Game</button>
+                            <button id="skip-stage-btn" class="debug-button skip-button">Skip to Letters</button>
+                        </div>
+                        <div id="reset-confirm" class="reset-confirm hidden">
+                            <p class="reset-warning">Reset all progress?</p>
+                            <div class="confirm-buttons">
+                                <button id="reset-yes-btn" class="debug-button confirm-yes">Yes</button>
+                                <button id="reset-no-btn" class="debug-button confirm-no">No</button>
+                            </div>
+                        </div>
                     </div>
                     
                     <h2>Gift Progress</h2>

@@ -100,6 +100,50 @@ body {
     background-color: #991b1b;
 }
 
+.reset-confirm {
+    text-align: center;
+}
+
+.reset-warning {
+    color: #fbbf24;
+    font-size: 0.9rem;
+    margin: 10px 0 15px 0;
+    font-weight: bold;
+}
+
+.confirm-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.confirm-yes {
+    background-color: #dc2626;
+    flex: 1;
+}
+
+.confirm-yes:hover {
+    background-color: #b91c1c;
+}
+
+.confirm-no {
+    background-color: #6b7280;
+    flex: 1;
+}
+
+.confirm-no:hover {
+    background-color: #4b5563;
+}
+
+.skip-button {
+    background-color: #7c3aed;
+    margin-top: 8px;
+}
+
+.skip-button:hover {
+    background-color: #6d28d9;
+}
+
 .stats {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -580,6 +624,31 @@ button.absent {
     border-radius: 8px;
 }
 
+/* New word row styles */
+.word-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    gap: 12px;
+    padding: 8px;
+    background-color: rgba(58, 58, 60, 0.3);
+    border-radius: 6px;
+}
+
+.word-label {
+    font-weight: bold;
+    color: #6aaa64;
+    min-width: 50px;
+    font-size: 0.9rem;
+    text-align: right;
+}
+
+.letters-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
 .draggable-letter {
     width: 45px;
     height: 45px;
@@ -591,19 +660,28 @@ button.absent {
     font-size: 1.3rem;
     font-weight: bold;
     border-radius: 4px;
-    cursor: grab;
+    cursor: move;
     user-select: none;
     transition: all 0.2s ease;
+    position: relative;
 }
 
 .draggable-letter:hover {
     background-color: #9ca3af;
-    transform: translateY(-2px);
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
-.draggable-letter:active {
-    cursor: grabbing;
-    transform: scale(0.95);
+.draggable-letter.dragging {
+    opacity: 0.8;
+    transform: scale(1.1) rotate(3deg);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    z-index: 1000;
+}
+
+.letter-slot.filled {
+    background-color: #2d2d30;
+    border-color: #565758;
 }
 
 .word-arranging-buttons {
@@ -663,4 +741,16 @@ button.absent {
     .word-arranging-buttons button {
         width: 200px;
     }
+}
+
+/* Full-width word arranging game */
+#word-arranging-game {
+    width: 100%;
+    max-width: none;
+}
+
+.game-layout:has(#word-arranging-game) {
+    grid-template-columns: 1fr;
+    max-width: 900px;
+    margin: 0 auto;
 }

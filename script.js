@@ -300,7 +300,21 @@ class WordleGame {
 
         // Debug reset button event listener
         document.getElementById('reset-game-btn').addEventListener('click', () => {
-            this.resetAllProgress();
+            this.showResetConfirmation();
+        });
+
+        // Debug confirmation button listeners
+        document.getElementById('reset-yes-btn').addEventListener('click', () => {
+            this.confirmReset();
+        });
+
+        document.getElementById('reset-no-btn').addEventListener('click', () => {
+            this.cancelReset();
+        });
+
+        // Debug skip stage button listener
+        document.getElementById('skip-stage-btn').addEventListener('click', () => {
+            this.skipToLetterGame();
         });
     }
 
@@ -500,42 +514,87 @@ class WordleGame {
     }
 
     resetAllProgress() {
-        if (confirm('Are you sure you want to reset all progress? This will clear all solved words and start over.')) {
-            // Clear localStorage
-            localStorage.removeItem('wordle-solved-words');
-            
-            // Reset game state
-            this.solvedWords = [];
-            this.giftComplete = false;
-            this.gameOver = false;
-            
-            // Reset board and display
-            this.currentRow = 0;
-            this.currentCol = 0;
-            this.guesses = Array(6).fill().map(() => Array(5).fill(''));
-            
-            // Clear the board
-            const tiles = document.querySelectorAll('.tile');
-            tiles.forEach(tile => {
-                tile.textContent = '';
-                tile.classList.remove('filled', 'correct', 'present', 'absent', 'shake');
-            });
-            
-            // Reset keyboard
-            this.resetKeyboard();
-            
-            // Get a new word
-            this.currentWord = this.getRandomWord();
-            
-            // Update all displays
-            this.updateWordsDisplay();
-            this.updateDebugDisplay();
-            
-            // Hide any modals
-            document.getElementById('modal').classList.add('hidden');
-            
-            console.log('Game progress reset! New word:', this.currentWord);
-        }
+        // Clear localStorage
+        localStorage.removeItem('wordle-solved-words');
+        
+        // Reset game state
+        this.solvedWords = [];
+        this.giftComplete = false;
+        this.gameOver = false;
+        
+        // Reset board and display
+        this.currentRow = 0;
+        this.currentCol = 0;
+        this.guesses = Array(6).fill().map(() => Array(5).fill(''));
+        
+        // Clear the board
+        const tiles = document.querySelectorAll('.tile');
+        tiles.forEach(tile => {
+            tile.textContent = '';
+            tile.classList.remove('filled', 'correct', 'present', 'absent', 'shake');
+        });
+        
+        // Reset keyboard
+        this.resetKeyboard();
+        
+        // Get a new word
+        this.currentWord = this.getRandomWord();
+        
+        // Update all displays
+        this.updateWordsDisplay();
+        this.updateDebugDisplay();
+        
+        // Hide any modals
+        document.getElementById('modal').classList.add('hidden');
+        
+        console.log('Game progress reset! New word:', this.currentWord);
+    }
+
+    showResetConfirmation() {
+        document.getElementById('reset-normal').classList.add('hidden');
+        document.getElementById('reset-confirm').classList.remove('hidden');
+    }
+
+    confirmReset() {
+        this.resetAllProgress();
+        this.hideResetConfirmation();
+    }
+
+    cancelReset() {
+        this.hideResetConfirmation();
+    }
+
+    hideResetConfirmation() {
+        document.getElementById('reset-normal').classList.remove('hidden');
+        document.getElementById('reset-confirm').classList.add('hidden');
+    }
+
+    skipToLetterGame() {
+        // Mark all target words as solved for testing
+        this.TARGET_WORDS.forEach((word, index) => {
+            const attempts = index + 2; // Vary the attempts (2, 3, 4)
+            if (!this.solvedWords.find(item => item.word === word)) {
+                this.solvedWords.push({ 
+                    word, 
+                    attempts, 
+                    date: new Date().toISOString() 
+                });
+            }
+        });
+        
+        // Mark gift as complete
+        this.giftComplete = true;
+        
+        // Save progress
+        this.saveSolvedWords();
+        
+        // Update display
+        this.updateWordsDisplay();
+        
+        // Start the letter arranging game directly
+        this.startWordArrangingGame();
+        
+        console.log('Skipped to letter arranging game!');
     }
 
     startWordArrangingGame() {
@@ -543,11 +602,14 @@ class WordleGame {
         document.querySelector('.game-section').style.display = 'none';
         document.querySelector('header h1').textContent = '🎁 LETTER ARRANGING 🎄';
         
+        // Hide the words section temporarily 
+        document.querySelector('.words-section').style.display = 'none';
+        
         this.createWordArrangingInterface();
     }
 
     createWordArrangingInterface() {
-        const container = document.querySelector('.container');
+        const gameLayout = document.querySelector('.game-layout');
         
         // Create word arranging game HTML
         const wordGameHTML = `
@@ -583,8 +645,17 @@ class WordleGame {
                 
                 <div class="letters-pool">
                     <h3>Available Letters:</h3>
-                    <div class="letters-container" id="letters-container">
-                        <!-- Letters will be added by JavaScript -->
+                    <div class="word-row">
+                        <div class="word-label">EARTH:</div>
+                        <div class="letters-row" id="earth-letters"></div>
+                    </div>
+                    <div class="word-row">
+                        <div class="word-label">LILAC:</div>
+                        <div class="letters-row" id="lilac-letters"></div>
+                    </div>
+                    <div class="word-row">
+                        <div class="word-label">TEETH:</div>
+                        <div class="letters-row" id="teeth-letters"></div>
                     </div>
                 </div>
                 
@@ -593,85 +664,182 @@ class WordleGame {
                     <button id="reset-arrangement">Reset Letters</button>
                 </div>
             </div>
+            
+            <div class="debug-section">
+                <div class="debug-panel">
+                    <div class="debug-info">
+                        <div class="debug-item">
+                            <strong>Current Arrangement:</strong>
+                            <span id="current-arrangement">_______________</span>
+                        </div>
+                        <div class="debug-item">
+                            <strong>Target:</strong>
+                            <span>CHILLEATTHEATRE</span>
+                        </div>
+                    </div>
+                    <div class="debug-controls">
+                        <div id="reset-normal" class="reset-normal">
+                            <button id="reset-game-btn" class="debug-button">Reset Game</button>
+                            <button id="skip-stage-btn" class="debug-button skip-button">Skip to Letters</button>
+                        </div>
+                        <div id="reset-confirm" class="reset-confirm hidden">
+                            <p>Are you sure you want to reset all progress?</p>
+                            <button id="reset-yes-btn" class="debug-button confirm-yes">Yes</button>
+                            <button id="reset-no-btn" class="debug-button confirm-no">No</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         `;
         
-        // Insert after the game layout
-        container.insertAdjacentHTML('beforeend', wordGameHTML);
+        // Replace the entire game layout with the word arranging game
+        gameLayout.innerHTML = wordGameHTML;
         
         this.initializeLetters();
         this.addDragDropListeners();
+        
+        // Initialize debug info
+        this.updateDebugInfo();
+    }
+    
+    updateDebugInfo() {
+        const arrangementElement = document.getElementById('current-arrangement');
+        if (arrangementElement) {
+            const slots = document.querySelectorAll('.letter-slot');
+            let currentWord = '';
+            
+            slots.forEach(slot => {
+                if (slot.dataset.filled === 'true' && slot.querySelector('.draggable-letter')) {
+                    currentWord += slot.querySelector('.draggable-letter').textContent;
+                } else {
+                    currentWord += '_';
+                }
+            });
+            
+            arrangementElement.textContent = currentWord;
+        }
     }
 
     initializeLetters() {
-        const letters = 'EARTHLILACTEETH'.split('');
-        const container = document.getElementById('letters-container');
+        const wordLetters = {
+            'EARTH': 'EARTH'.split(''),
+            'LILAC': 'LILAC'.split(''),
+            'TEETH': 'TEETH'.split('')
+        };
         
-        letters.forEach((letter, index) => {
-            const letterElement = document.createElement('div');
-            letterElement.className = 'draggable-letter';
-            letterElement.textContent = letter;
-            letterElement.draggable = true;
-            letterElement.dataset.letter = letter;
-            letterElement.dataset.originalIndex = index;
-            container.appendChild(letterElement);
+        Object.entries(wordLetters).forEach(([word, letters]) => {
+            const container = document.getElementById(`${word.toLowerCase()}-letters`);
+            letters.forEach((letter, index) => {
+                const letterElement = document.createElement('div');
+                letterElement.className = 'draggable-letter';
+                letterElement.textContent = letter;
+                letterElement.draggable = true;
+                letterElement.dataset.letter = letter;
+                letterElement.dataset.originalIndex = `${word}-${index}`;
+                letterElement.dataset.sourceWord = word;
+                container.appendChild(letterElement);
+            });
         });
     }
 
     addDragDropListeners() {
-        const letters = document.querySelectorAll('.draggable-letter');
-        const slots = document.querySelectorAll('.letter-slot');
+        let draggedElement = null;
+        let isDragging = false;
+        let offsetX, offsetY;
         
-        // Add drag listeners to letters
-        letters.forEach(letter => {
-            letter.addEventListener('dragstart', (e) => {
-                e.dataTransfer.setData('text/plain', e.target.dataset.letter);
-                e.dataTransfer.setData('element-id', e.target.dataset.originalIndex);
+        // Function to make an element draggable
+        const makeDraggable = (element) => {
+            element.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                draggedElement = element;
+                
+                // Calculate offset from mouse to element position
+                const rect = element.getBoundingClientRect();
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+                
+                // If letter is in a slot, unsnap it but keep the element
+                if (element.dataset.slotIndex) {
+                    const slot = document.querySelector(`[data-target="${element.dataset.slotIndex}"]`);
+                    if (slot) {
+                        // Move the element to document body for free positioning
+                        document.body.appendChild(element);
+                        slot.dataset.filled = 'false';
+                        slot.classList.remove('filled');
+                    }
+                    delete element.dataset.slotIndex;
+                }
+                
+                // Set initial position for absolute positioning
+                element.style.position = 'absolute';
+                element.style.left = (rect.left + window.scrollX) + 'px';
+                element.style.top = (rect.top + window.scrollY) + 'px';
+                element.style.zIndex = '1000';
+                element.classList.add('dragging');
+                
+                // Update debug info immediately
+                this.updateDebugInfo();
+                
+                e.preventDefault();
             });
+        };
+        
+        // Add draggable behavior to all letters
+        document.querySelectorAll('.draggable-letter').forEach(makeDraggable);
+        
+        // Global mouse move handler
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging && draggedElement) {
+                draggedElement.style.left = (e.clientX - offsetX + window.scrollX) + 'px';
+                draggedElement.style.top = (e.clientY - offsetY + window.scrollY) + 'px';
+            }
         });
         
-        // Add drop listeners to slots
-        slots.forEach(slot => {
-            slot.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                slot.classList.add('drag-over');
-            });
-            
-            slot.addEventListener('dragleave', (e) => {
-                slot.classList.remove('drag-over');
-            });
-            
-            slot.addEventListener('drop', (e) => {
-                e.preventDefault();
-                slot.classList.remove('drag-over');
+        // Global mouse up handler
+        document.addEventListener('mouseup', (e) => {
+            if (isDragging && draggedElement) {
+                isDragging = false;
+                draggedElement.classList.remove('dragging');
                 
-                const letter = e.dataTransfer.getData('text/plain');
-                const elementId = e.dataTransfer.getData('element-id');
-                const sourceElement = document.querySelector(`[data-original-index="${elementId}"]`);
+                // Check if dropped on a slot
+                const slots = document.querySelectorAll('.letter-slot');
+                let dropped = false;
                 
-                // If slot is already occupied, return letter to pool
-                if (slot.textContent) {
-                    const existingLetter = slot.textContent;
-                    this.returnLetterToPool(existingLetter);
+                for (const slot of slots) {
+                    const slotRect = slot.getBoundingClientRect();
+                    if (e.clientX >= slotRect.left && e.clientX <= slotRect.right &&
+                        e.clientY >= slotRect.top && e.clientY <= slotRect.bottom) {
+                        
+                        // If slot is occupied, return that letter to its original position
+                        if (slot.dataset.filled === 'true') {
+                            const existingLetter = slot.querySelector('.draggable-letter');
+                            if (existingLetter) {
+                                this.returnLetterToOriginalPosition(existingLetter);
+                            }
+                        }
+                        
+                        // Snap to slot
+                        this.snapToSlot(draggedElement, slot);
+                        dropped = true;
+                        break;
+                    }
                 }
                 
-                // Place letter in slot
-                slot.textContent = letter;
-                slot.dataset.filled = 'true';
+                // If not dropped on a slot, letter stays where it was dropped
+                if (!dropped) {
+                    draggedElement.style.position = 'absolute';
+                    draggedElement.style.zIndex = '1';
+                    // Make sure it's not associated with any slot
+                    if (draggedElement.dataset.slotIndex) {
+                        delete draggedElement.dataset.slotIndex;
+                    }
+                }
                 
-                // Hide the draggable element
-                if (sourceElement) {
-                    sourceElement.style.display = 'none';
-                }
-            });
-            
-            // Double click to remove letter from slot
-            slot.addEventListener('dblclick', (e) => {
-                if (slot.textContent) {
-                    this.returnLetterToPool(slot.textContent);
-                    slot.textContent = '';
-                    slot.dataset.filled = 'false';
-                }
-            });
+                // Update debug info after drop
+                this.updateDebugInfo();
+                
+                draggedElement = null;
+            }
         });
         
         // Add button listeners
@@ -682,6 +850,49 @@ class WordleGame {
         document.getElementById('reset-arrangement').addEventListener('click', () => {
             this.resetArrangement();
         });
+    }
+
+    snapToSlot(letter, slot) {
+        // Position letter in slot
+        const slotRect = slot.getBoundingClientRect();
+        letter.style.position = 'absolute';
+        letter.style.left = (slotRect.left + window.scrollX) + 'px';
+        letter.style.top = (slotRect.top + window.scrollY) + 'px';
+        letter.style.zIndex = '2';
+        
+        // Mark slot as filled and store reference
+        slot.dataset.filled = 'true';
+        slot.classList.add('filled');
+        letter.dataset.slotIndex = slot.dataset.target;
+        
+        // Append letter to slot for organization
+        slot.appendChild(letter);
+        
+        // Update debug info
+        this.updateDebugInfo();
+    }
+    
+    returnLetterToOriginalPosition(letter) {
+        // Return to original word row
+        const sourceWord = letter.dataset.sourceWord;
+        if (sourceWord) {
+            const container = document.getElementById(`${sourceWord.toLowerCase()}-letters`);
+            if (container) {
+                container.appendChild(letter);
+                
+                // Reset positioning and styling
+                letter.style.position = 'relative';
+                letter.style.left = 'auto';
+                letter.style.top = 'auto';
+                letter.style.zIndex = '1';
+                
+                // Clear slot reference
+                delete letter.dataset.slotIndex;
+                
+                // Remove any dragging class
+                letter.classList.remove('dragging');
+            }
+        }
     }
 
     returnLetterToPool(letter) {
@@ -699,7 +910,11 @@ class WordleGame {
         let currentWord = '';
         
         slots.forEach(slot => {
-            currentWord += slot.textContent || '_';
+            if (slot.dataset.filled === 'true' && slot.querySelector('.draggable-letter')) {
+                currentWord += slot.querySelector('.draggable-letter').textContent;
+            } else {
+                currentWord += '_';
+            }
         });
         
         const targetPhrase = 'CHILLEATTHEATRE';
@@ -712,19 +927,36 @@ class WordleGame {
     }
 
     resetArrangement() {
+        // Find all letters regardless of where they are in the DOM
+        const allLetters = document.querySelectorAll('.draggable-letter');
         const slots = document.querySelectorAll('.letter-slot');
-        const letters = document.querySelectorAll('.draggable-letter');
         
-        // Clear all slots
+        // Clear all slots first
         slots.forEach(slot => {
-            slot.textContent = '';
+            slot.innerHTML = '';
             slot.dataset.filled = 'false';
+            slot.classList.remove('filled');
         });
         
-        // Show all letters
-        letters.forEach(letter => {
-            letter.style.display = 'block';
+        // Return all letters to their original word rows
+        allLetters.forEach(letter => {
+            this.returnLetterToOriginalPosition(letter);
         });
+        
+        // Re-add drag listeners to ensure all letters are draggable
+        setTimeout(() => {
+            document.querySelectorAll('.draggable-letter').forEach(letter => {
+                // Remove any existing listeners by cloning the element
+                const newLetter = letter.cloneNode(true);
+                letter.parentNode.replaceChild(newLetter, letter);
+            });
+            
+            // Re-initialize drag listeners
+            this.addDragDropListeners();
+            
+            // Update debug info
+            this.updateDebugInfo();
+        }, 100);
     }
 
     showFinalGiftModal() {
