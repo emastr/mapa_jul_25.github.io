@@ -1,3 +1,32 @@
+/* Snowflake Effect */
+.snowflakes {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.snowflake {
+    position: absolute;
+    top: -10px;
+    color: rgba(255, 255, 255, 0.3); /* More faint than gift page */
+    user-select: none;
+    pointer-events: none;
+    animation: fall linear infinite;
+}
+
+@keyframes fall {
+    from {
+        transform: translateY(-100px);
+    }
+    to {
+        transform: translateY(calc(100vh + 100px));
+    }
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -243,6 +272,48 @@ header {
     border-bottom: 1px solid #3a3a3c;
     padding-bottom: 20px;
     margin-bottom: 20px;
+}
+
+.game-mode-buttons {
+    margin-top: 15px;
+}
+
+.mode-button {
+    background: linear-gradient(135deg, #538d4e, #6aaa64);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+.mode-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+    background: linear-gradient(135deg, #6aaa64, #538d4e);
+}
+
+.mode-button:active {
+    transform: translateY(0);
+}
+
+.game-mode-section {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #3a3a3c;
+}
+
+.words-section .mode-button {
+    width: 100%;
+    margin: 0;
+    font-size: 0.9rem;
+    padding: 10px 16px;
 }
 
 h1 {
@@ -775,8 +846,108 @@ button.absent {
     max-width: none;
 }
 
+/* Word arranging layout with side-by-side debug */
+.word-arranging-layout {
+    display: flex;
+    gap: 40px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.word-arranging-layout #word-arranging-game {
+    flex: 1;
+    max-width: 800px;
+}
+
+.debug-section-right {
+    width: 300px;
+    flex-shrink: 0;
+}
+
+.debug-section-right .debug-panel {
+    position: sticky;
+    top: 20px;
+    background: rgba(58, 58, 60, 0.3);
+    border: 1px solid #3a3a3c;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.debug-section-right .debug-info {
+    margin-bottom: 20px;
+}
+
+.debug-section-right .debug-item {
+    margin-bottom: 15px;
+    color: #ffffff;
+}
+
+.debug-section-right .debug-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.debug-section-right .debug-button {
+    width: 100%;
+    padding: 8px 12px;
+    background: #818384;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.debug-section-right .debug-button:hover {
+    background: #565758;
+}
+
+.debug-section-right .autofill-button {
+    background: #f59e0b;
+}
+
+.debug-section-right .autofill-button:hover {
+    background: #d97706;
+}
+
+.debug-section-right .confirm-yes {
+    background: #dc2626;
+}
+
+.debug-section-right .confirm-yes:hover {
+    background: #b91c1c;
+}
+
+.debug-section-right .confirm-no {
+    background: #16a34a;
+}
+
+.debug-section-right .confirm-no:hover {
+    background: #15803d;
+}
+
 .game-layout:has(#word-arranging-game) {
     grid-template-columns: 1fr;
-    max-width: 900px;
+    max-width: 1200px;
     margin: 0 auto;
+}
+
+/* Responsive adjustments for word arranging layout */
+@media (max-width: 1024px) {
+    .word-arranging-layout {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .debug-section-right {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .debug-section-right .debug-panel {
+        position: relative;
+    }
 }

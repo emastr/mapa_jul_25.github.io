@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎄 Christmas Gift Revealed! 🎄</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f4c3a 0%, #2d5a4f 50%, #0f4c3a 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .gift-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .gift-title {
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .gift-message {
+            font-size: 1.3em;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .spelled-word {
+            font-size: 2em;
+            font-weight: bold;
+            color: #90ee90;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin: 20px 0;
+            letter-spacing: 3px;
+        }
+
+        .gift-explanation {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .gift-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 15px 0;
+            font-size: 1.2em;
+        }
+
+        .gift-item .emoji {
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+
+        .play-again-btn {
+            background: linear-gradient(135deg, #538d4e, #6aaa64);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .play-again-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(135deg, #6aaa64, #538d4e);
+        }
+
+        .snowflakes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .snowflake {
+            position: absolute;
+            top: -10px;
+            color: rgba(255, 255, 255, 0.8);
+            user-select: none;
+            pointer-events: none;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            from {
+                transform: translateY(-100px);
+            }
+            to {
+                transform: translateY(calc(100vh + 100px));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .gift-container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .gift-title {
+                font-size: 2em;
+            }
+            
+            .gift-message {
+                font-size: 1.1em;
+            }
+            
+            .spelled-word {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="snowflakes">
+        <!-- Snowflakes will be added by JavaScript -->
+    </div>
+
+    <div class="gift-container">
+        <h1 class="gift-title">🎄 CHRISTMAS GIFT REVEALED! 🎄</h1>
+        
+        <div class="gift-message">
+            Amazing! You've spelled out:
+        </div>
+        
+        <div class="spelled-word">CHILL - EAT - THEATRE</div>
+        
+        <div class="gift-explanation">
+            <div class="gift-message">Your Christmas gift is about taking time to:</div>
+            
+            <div class="gift-item">
+                <span class="emoji">🧘‍♀️</span>
+                <strong>CHILL</strong> and relax
+            </div>
+            
+            <div class="gift-item">
+                <span class="emoji">🍽️</span>
+                <strong>EAT</strong> delicious food
+            </div>
+            
+            <div class="gift-item">
+                <span class="emoji">🎭</span>
+                <strong>THEATRE</strong> and enjoy the arts
+            </div>
+        </div>
+        
+        <div class="gift-message">
+            <strong>Merry Christmas! 🎁✨</strong>
+        </div>
+        
+        <button class="play-again-btn" onclick="window.location.href='index.html'">
+            Play Again
+        </button>
+    </div>
+
+    <script>
+        // Create falling snowflakes
+        function createSnowflakes() {
+            const snowflakesContainer = document.querySelector('.snowflakes');
+            const snowflakeSymbols = ['❄', '❅', '✦', '✧', '✶'];
+            
+            for (let i = 0; i < 50; i++) {
+                const snowflake = document.createElement('div');
+                snowflake.className = 'snowflake';
+                snowflake.innerHTML = snowflakeSymbols[Math.floor(Math.random() * snowflakeSymbols.length)];
+                snowflake.style.left = Math.random() * 100 + '%';
+                snowflake.style.animationDuration = Math.random() * 3 + 2 + 's';
+                snowflake.style.animationDelay = Math.random() * 2 + 's';
+                snowflake.style.fontSize = Math.random() * 10 + 10 + 'px';
+                snowflake.style.opacity = Math.random() * 0.8 + 0.2;
+                snowflakesContainer.appendChild(snowflake);
+            }
+        }
+
+        // Initialize snowflakes when page loads
+        document.addEventListener('DOMContentLoaded', createSnowflakes);
+    </script>
+</body>
+</html>

@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="snowflakes">
+        <!-- Snowflakes will be added by JavaScript -->
+    </div>
+    
     <div class="container">
         <header>
             <h1>🎁 CHRISTMAS WORDLE 🎄</h1>
@@ -91,6 +95,12 @@
                     </div>
                     <div id="words-list" class="words-list">
                         <p class="empty-state">Start playing to see your solved words!</p>
+                    </div>
+                    
+                    <div class="game-mode-section">
+                        <button id="two-player-btn" class="mode-button" onclick="window.location.href='two-player.html'">
+                            👥 Two Player Mode
+                        </button>
                     </div>
                 </div>
             </aside>
