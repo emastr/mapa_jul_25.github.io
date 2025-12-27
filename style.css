@@ -311,13 +311,14 @@ header {
 
 .words-section .mode-button {
     width: 100%;
-    margin: 0 0 10px 0;
+    margin: 0 0 20px 0;
     font-size: 0.9rem;
     padding: 10px 16px;
 }
 
 .reset-button {
     background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+    margin-top: 10px !important;
 }
 
 .reset-button:hover {
