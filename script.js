@@ -305,7 +305,12 @@ class WordleGame {
 
         // Debug confirmation button listeners
         document.getElementById('reset-yes-btn').addEventListener('click', () => {
-            this.confirmReset();
+            this.resetAllProgress();
+            // Ensure we're in wordle mode in case we were in letter mode
+            if (document.getElementById('word-arranging-game')) {
+                this.returnToWordleMode();
+            }
+            this.hideResetConfirmation();
         });
 
         document.getElementById('reset-no-btn').addEventListener('click', () => {
@@ -558,6 +563,11 @@ class WordleGame {
     confirmReset() {
         this.resetAllProgress();
         this.hideResetConfirmation();
+        
+        // If we're in letter arranging mode, return to wordle mode
+        if (document.getElementById('word-arranging-game')) {
+            this.returnToWordleMode();
+        }
     }
 
     cancelReset() {
@@ -596,6 +606,37 @@ class WordleGame {
         
         console.log('Skipped to letter arranging game!');
     }
+    
+    returnToWordleMode() {
+        // Restore the original game layout
+        const gameLayout = document.querySelector('.game-layout');
+        
+        // Recreate the original wordle game HTML structure
+        gameLayout.innerHTML = `
+            <div class="game-section">
+                <div class="board" id="board">
+                    <!-- Game board will be created by JavaScript -->
+                </div>
+                <div class="keyboard" id="keyboard">
+                    <!-- Keyboard will be created by JavaScript -->
+                </div>
+            </div>
+        `;
+        
+        // Show the words section again
+        document.querySelector('.words-section').style.display = 'block';
+        
+        // Reset the header
+        document.querySelector('header h1').textContent = '🎄 CHRISTMAS WORDLE 🎁';
+        
+        // Reinitialize the game
+        this.createBoard();
+        this.createKeyboard();
+        this.updateWordsDisplay();
+        this.updateCurrentWordDisplay();
+        
+        console.log('Returned to Wordle mode');
+    }
 
     startWordArrangingGame() {
         // Hide the wordle game and show word arranging game
@@ -624,13 +665,11 @@ class WordleGame {
                             <div class="letter-slot" data-target="3"></div>
                             <div class="letter-slot" data-target="4"></div>
                         </div>
-                        <div class="word-separator">-</div>
                         <div class="word-pattern">
                             <div class="letter-slot" data-target="5"></div>
                             <div class="letter-slot" data-target="6"></div>
                             <div class="letter-slot" data-target="7"></div>
                         </div>
-                        <div class="word-separator">-</div>
                         <div class="word-pattern">
                             <div class="letter-slot" data-target="8"></div>
                             <div class="letter-slot" data-target="9"></div>
@@ -680,7 +719,8 @@ class WordleGame {
                     <div class="debug-controls">
                         <div id="reset-normal" class="reset-normal">
                             <button id="reset-game-btn" class="debug-button">Reset Game</button>
-                            <button id="skip-stage-btn" class="debug-button skip-button">Skip to Letters</button>
+                            <button id="skip-stage-btn" class="debug-button skip-button" style="display: none;">Skip to Letters</button>
+                            <button id="autofill-arrangement" class="debug-button autofill-button">🔧 Autofill Letters</button>
                         </div>
                         <div id="reset-confirm" class="reset-confirm hidden">
                             <p>Are you sure you want to reset all progress?</p>
@@ -700,6 +740,23 @@ class WordleGame {
         
         // Initialize debug info
         this.updateDebugInfo();
+        
+        // Add debug button listeners for letter arranging mode
+        document.getElementById('reset-game-btn').addEventListener('click', () => {
+            this.showResetConfirmation();
+        });
+        
+        document.getElementById('reset-yes-btn').addEventListener('click', () => {
+            this.confirmReset();
+        });
+        
+        document.getElementById('reset-no-btn').addEventListener('click', () => {
+            this.cancelReset();
+        });
+        
+        document.getElementById('autofill-arrangement').addEventListener('click', () => {
+            this.autofillArrangement();
+        });
     }
     
     updateDebugInfo() {
@@ -872,6 +929,46 @@ class WordleGame {
         this.updateDebugInfo();
     }
     
+    autofillArrangement() {
+        const targetPhrase = 'CHILLEATTHEATRE';
+        const slots = document.querySelectorAll('.letter-slot');
+        
+        // First, reset all arrangements
+        this.resetArrangement();
+        
+        // Wait a moment for reset to complete, then autofill
+        setTimeout(() => {
+            // Get all available letters
+            const allLetters = document.querySelectorAll('.draggable-letter');
+            const availableLetters = {};
+            
+            // Count available letters
+            allLetters.forEach(letter => {
+                const char = letter.textContent;
+                if (!availableLetters[char]) {
+                    availableLetters[char] = [];
+                }
+                availableLetters[char].push(letter);
+            });
+            
+            // Fill each slot with the correct letter
+            for (let i = 0; i < targetPhrase.length; i++) {
+                const targetChar = targetPhrase[i];
+                const slot = document.querySelector(`[data-target="${i}"]`);
+                
+                if (availableLetters[targetChar] && availableLetters[targetChar].length > 0) {
+                    const letter = availableLetters[targetChar].shift(); // Use the first available letter
+                    this.snapToSlot(letter, slot);
+                }
+            }
+            
+            // Update debug info and show completion message
+            this.updateDebugInfo();
+            console.log('Autofill completed! Current arrangement:', targetPhrase);
+            this.showMessage('🔧 Debug: Auto-filled with correct arrangement!');
+        }, 200);
+    }
+    
     returnLetterToOriginalPosition(letter) {
         // Return to original word row
         const sourceWord = letter.dataset.sourceWord;
@@ -908,10 +1005,12 @@ class WordleGame {
     checkArrangement() {
         const slots = document.querySelectorAll('.letter-slot');
         let currentWord = '';
+        let filledCount = 0;
         
         slots.forEach(slot => {
             if (slot.dataset.filled === 'true' && slot.querySelector('.draggable-letter')) {
                 currentWord += slot.querySelector('.draggable-letter').textContent;
+                filledCount++;
             } else {
                 currentWord += '_';
             }
@@ -921,9 +1020,16 @@ class WordleGame {
         
         if (currentWord === targetPhrase) {
             this.showFinalGiftModal();
+        } else if (filledCount === 0) {
+            this.showMessage('Please place some letters first!');
+        } else if (filledCount < 15) {
+            this.showMessage(`You need to fill all ${15} slots. Currently filled: ${filledCount}`);
         } else {
-            this.showMessage('Not quite right! Keep arranging the letters.');
+            this.showMessage(`Not quite right! You have: "${currentWord.replace(/_/g, ' ')}". Keep trying!`);
         }
+        
+        // Update debug info
+        this.updateDebugInfo();
     }
 
     resetArrangement() {

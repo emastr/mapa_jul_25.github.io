@@ -55,6 +55,9 @@ body {
     border-radius: 8px;
     padding: 15px;
     margin-bottom: 20px;
+    position: sticky;
+    top: 20px;
+    z-index: 10;
 }
 
 .debug-section h3 {
@@ -457,7 +460,7 @@ button.absent {
 /* Responsive design */
 @media (max-width: 1024px) {
     .game-layout {
-        grid-template-columns: 1fr 250px;
+        grid-template-columns: 1fr 280px;
         gap: 20px;
     }
     
@@ -468,16 +471,21 @@ button.absent {
 
 @media (max-width: 768px) {
     .game-layout {
-        grid-template-columns: 1fr;
-        gap: 20px;
+        grid-template-columns: 1fr 250px;
+        gap: 15px;
     }
     
     .words-section {
-        border-left: none;
-        border-top: 1px solid #3a3a3c;
-        padding-left: 0;
-        padding-top: 20px;
+        border-left: 1px solid #3a3a3c;
+        padding-left: 10px;
+        padding-top: 0;
     }
+    
+    .debug-section {
+        padding: 10px;
+        margin-bottom: 15px;
+    }
+}
     
     .words-panel {
         position: static;
@@ -557,10 +565,10 @@ button.absent {
 
 .pattern-container {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 15px;
-    flex-wrap: wrap;
+    gap: 20px;
 }
 
 .word-pattern {
@@ -704,6 +712,24 @@ button.absent {
 
 .word-arranging-buttons button:hover {
     background-color: #4a7c59;
+}
+
+#autofill-arrangement {
+    background-color: #7c3aed;
+    margin-left: 20px;
+}
+
+#autofill-arrangement:hover {
+    background-color: #6d28d9;
+}
+
+.autofill-button {
+    background-color: #7c3aed;
+    margin-top: 8px;
+}
+
+.autofill-button:hover {
+    background-color: #6d28d9;
 }
 
 #reset-arrangement {
